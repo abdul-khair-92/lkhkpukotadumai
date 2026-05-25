@@ -1,0 +1,56 @@
+/**
+ * Hanya area konten (.content-wrapper) yang di-scroll;
+ * header, sidebar, dan footer tetap di viewport.
+ */
+body.lkh-content-scroll,
+body.lkh-content-scroll html {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+body.lkh-content-scroll .wrapper {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+body.lkh-content-scroll.fixed .content-wrapper {
+    position: fixed;
+    top: var(--lkh-header-h, 80px);
+    left: var(--lkh-sidebar-w, 270px);
+    right: 0;
+    bottom: var(--lkh-footer-h, 56px);
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.lkh-content-scroll .main-footer {
+    position: fixed;
+    bottom: 0;
+    left: var(--lkh-sidebar-w, 270px);
+    right: 0;
+    margin-left: 0 !important;
+    z-index: 800;
+}
+
+body.lkh-content-scroll.sidebar-collapse:not(.sidebar-mini) .content-wrapper,
+body.lkh-content-scroll.sidebar-collapse:not(.sidebar-mini) .main-footer {
+    left: 0;
+}
+
+@media (max-width: 767px) {
+    body.lkh-content-scroll.fixed .content-wrapper {
+        top: var(--lkh-header-h, 125px);
+        left: 0;
+    }
+
+    body.lkh-content-scroll .main-footer {
+        left: 0;
+    }
+}
