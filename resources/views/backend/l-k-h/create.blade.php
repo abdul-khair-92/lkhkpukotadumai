@@ -6,15 +6,6 @@
 			{!! html()->text('tanggal', null)->class('form-control lkh-tanggal-picker')->id('tanggal')->attribute('placeholder', 'Klik untuk pilih tanggal')->attribute('autocomplete', 'off') !!}
 			<small class="text-muted d-block mt-5">Hari Sabtu/Minggu, hari libur, dan tanggal setelah hari ini tidak dapat dipilih.</small>
 		</div>
-		<div class="form-group">
-			{!! html()->label()->class('control-label')->for('status_kehadiran')->text('Status Kehadiran') !!}
-			{!! html()->select('status_kehadiran', [
-				'hadir' => 'Hadir',
-				'dl' => 'DL',
-				'cuti' => 'Cuti',
-				'sakit' => 'Sakit'
-			], 'hadir')->class('form-control select2')->id('status_kehadiran') !!}
-		</div>
 		<div class='form-group'>
 			{!! html()->label()->class('control-label')->for('kegiatan')->text('Kegiatan') !!}
 			{!! html()->textarea('kegiatan',NULL)->class('form-control')->id('kegiatan')->attribute('rows', 6)->attribute('style', 'min-height:120px;') !!}
@@ -46,43 +37,6 @@
 @include('backend.l-k-h.partials.tanggal-flatpickr')
 <script>
     $(function () {
-        var $status = $('#status_kehadiran');
-        var $modal = $status.closest('.modal');
-
-        if ($status.hasClass('select2-hidden-accessible')) {
-            $status.select2('destroy');
-        }
-        $status.select2({
-            width: '100%',
-            dropdownParent: $modal.length ? $modal : $(document.body)
-        });
-
-        function toggleKegiatanOutput() {
-            var status = $status.val();
-            if (status === 'hadir') {
-                $('#kegiatan').closest('.form-group').show();
-                $('#output').closest('.form-group').show();
-                $('#kegiatan').prop('disabled', false).prop('readonly', false);
-                $('#output').prop('disabled', false).prop('readonly', false);
-                $('#kegiatan').val('');
-                $('#output').val('');
-            } else if (status === 'dl') {
-                $('#kegiatan').closest('.form-group').show();
-                $('#output').closest('.form-group').show();
-                $('#kegiatan').prop('disabled', false).prop('readonly', false).val('DL');
-                $('#output').prop('disabled', false).prop('readonly', false).val('DL');
-            } else {
-                $('#kegiatan').closest('.form-group').hide();
-                $('#output').closest('.form-group').hide();
-                var nilai = status.charAt(0).toUpperCase() + status.slice(1);
-                $('#kegiatan').prop('disabled', false).prop('readonly', true).val(nilai);
-                $('#output').prop('disabled', false).prop('readonly', true).val(nilai);
-            }
-        }
-
-        $status.on('change', toggleKegiatanOutput);
-        toggleKegiatanOutput();
-
         if (typeof window.initLkhTanggalFlatpickr === 'function') {
             window.initLkhTanggalFlatpickr();
         }

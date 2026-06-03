@@ -247,7 +247,7 @@ throw new Error('template requires jQuery')
 //      $('body').addClass(ClassName.expandFeature)
 //    }
 
-    $(Selector.contentWrapper).on(function () {
+    $(Selector.contentWrapper).on('click', function () {
       // Enable hide menu when clicking on the content-wrapper on small screens
       if ($(window).width() <= this.options.collapseScreenSize && $('body').hasClass(ClassName.open)) {
         this.close()

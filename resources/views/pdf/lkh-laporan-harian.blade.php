@@ -48,7 +48,7 @@
     </tr>
     <tr>
         <td><strong>JABATAN</strong></td>
-        <td>: {{ $jabatanPegawai }} {{ $subbagianPegawai ? ' - ' . $subbagianPegawai : '' }}</td>
+        <td>: {{ $jabatanPegawai }}@if(!$hideMenyetujuiAtasan && $subbagianPegawai && $subbagianPegawai !== '—') - {{ $subbagianPegawai }}@endif</td>
     </tr>
 </table>
 
@@ -77,20 +77,33 @@
 
 <table class="footer-wrap" cellspacing="0">
     <tr>
-        <td class="{{ $hideMenyetujuiAtasan ? 'col-pegawai-only' : 'col-pegawai' }}">
-            <div class="sig-title"></div>
-            <div>{{ strtoupper($jabatanPegawai) }}</div>
-            @if($subbagianPegawai && $subbagianPegawai !== '—')
-                <div style="font-size:8.5pt;">{{ strtoupper($subbagianPegawai) }}</div>
-            @endif
-            @if(!empty($qrPegawaiDataUri))
-                <div class="qr"><img src="{{ $qrPegawaiDataUri }}" alt="QR Pengaju" width="90" height="90"/></div>
-                <div class="qr-caption">Verifikasi pengajuan LKH</div>
-            @endif
-            <div class="sig-name">{{ $pegawai?->name }}</div>
-            <div>NIP. {{ $pegawai?->nip ?? '—' }}</div>
-        </td>
-        @if(! $hideMenyetujuiAtasan)
+        @if($hideMenyetujuiAtasan)
+            {{-- Kolom kiri kosong agar tanda tangan di sebelah kanan --}}
+            <td class="col-pegawai" style="width:50%;">&nbsp;</td>
+            <td class="col-menyetujui" style="width:50%;">
+                <div class="sig-title"></div>
+                <div>{{ strtoupper($jabatanPegawai) }}</div>
+                @if(!empty($qrPegawaiDataUri))
+                    <div class="qr"><img src="{{ $qrPegawaiDataUri }}" alt="QR Sekretaris" width="90" height="90"/></div>
+                    <div class="qr-caption">Verifikasi dokumen LKH</div>
+                @endif
+                <div class="sig-name">{{ $pegawai?->name }}</div>
+                <div>NIP. {{ $pegawai?->nip ?? '—' }}</div>
+            </td>
+        @else
+            <td class="col-pegawai">
+                <div class="sig-title"></div>
+                <div>{{ strtoupper($jabatanPegawai) }}</div>
+                @if($subbagianPegawai && $subbagianPegawai !== '—')
+                    <div style="font-size:8.5pt;">{{ strtoupper($subbagianPegawai) }}</div>
+                @endif
+                @if(!empty($qrPegawaiDataUri))
+                    <div class="qr"><img src="{{ $qrPegawaiDataUri }}" alt="QR Pengaju" width="90" height="90"/></div>
+                    <div class="qr-caption">Verifikasi pengajuan LKH</div>
+                @endif
+                <div class="sig-name">{{ $pegawai?->name }}</div>
+                <div>NIP. {{ $pegawai?->nip ?? '—' }}</div>
+            </td>
             <td class="col-menyetujui">
                 <div class="sig-title">MENYETUJUI ATASAN LANGSUNG</div>
                 <div>{{ strtoupper($jabatanMenyetujui) }}</div>

@@ -40,7 +40,7 @@
                     <div class="col-12">
                         <div class="box">
                             <div class="box-header">
-                                <h4 class="box-title">Content {!! $page->title ?? 'Page Name' !!}</h4>
+                                <h4 class="box-title">{!! $page->title ?? 'Page Name' !!}</h4>
                                 <div class="pull-right d-flex align-items-center flex-wrap justify-content-end" style="gap: 10px;">
                                     <span id="lkh-status-pengajuan" class="text-end"></span>
                                     <a id="btn-lihat-pdf-laporan" href="#" class="btn btn-info btn-sm" style="display: none;" target="_blank" rel="noopener" title="Unduh laporan PDF yang disetujui">

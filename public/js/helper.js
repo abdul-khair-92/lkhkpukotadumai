@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    if (localStorage.getItem('sidebar') === 'true') {
+    if (window.innerWidth > 767 && localStorage.getItem('sidebar') === 'true') {
         document.body.classList.add('sidebar-collapse');
         $('.small-notify').addClass('hide');
     } else {

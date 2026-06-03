@@ -132,9 +132,22 @@ class LkhPengajuanController extends Controller
             ], 500);
         }
 
+        // Upload PDF ke API KPU (non-blocking: jika gagal, persetujuan tetap tersimpan)
+        $uploadMessage = '';
+        try {
+            $pdfService->uploadToKpuApi($pengajuan->fresh());
+            $uploadMessage = ' PDF berhasil diunggah ke server KPU.';
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('LKH PDF: Upload ke API KPU gagal, PDF tetap tersimpan lokal.', [
+                'pengajuan_id' => $pengajuan->id,
+                'message' => $e->getMessage(),
+            ]);
+            $uploadMessage = ' Namun upload ke server KPU gagal, PDF tetap tersimpan lokal.';
+        }
+
         $this->notifyPegawai($pengajuan->fresh(['user']), 'approved');
 
-        return response()->json(['status' => true, 'message' => 'Laporan disetujui dan PDF telah dibuat.']);
+        return response()->json(['status' => true, 'message' => 'Laporan disetujui dan PDF telah dibuat.' . $uploadMessage]);
     }
 
     public function revisi(Request $request, string $id)

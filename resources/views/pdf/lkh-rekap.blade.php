@@ -45,8 +45,9 @@
             margin: 0 0 20px;
             line-height: 1.35;
             text-transform: uppercase;
+            height: 50px;
         }
-        .sig-gap { height: 32px; }
+        .sig-gap { height: 60px; }
         .sig-name { font-weight: bold; text-decoration: underline; margin: 0 0 4px; }
         .sig-nip { margin: 0; }
     </style>
@@ -112,7 +113,7 @@
     <tr>
         <td>
             <div class="sig-block">
-                <p class="sig-label">Mengetahui,</p>
+                <p class="sig-label">Dibuat oleh,</p>
                 <div class="sig-title">{{ strtoupper($sign['kasubbag_title'] ?? 'Kepala Subbagian') }}</div>
                 @if(!empty($sign['kasubbag_subtitle']))
                     <p class="sig-sub">{{ strtoupper($sign['kasubbag_subtitle']) }}</p>

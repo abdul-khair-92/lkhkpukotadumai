@@ -14,7 +14,10 @@
         </section>
 
         <section class="right" aria-label="Sign in form">
-            <h3>Sign in</h3>
+            <div style="text-align:center;">
+                <img src="{{ asset('eduadmin/images/KPU.svg') }}" alt="Logo KPU" style="width:60px; display:inline-block; margin-bottom:14px;">
+            </div>
+       
             <p class="description">Sign in to continue to {{ config('master.app.profile.short_name') }}</p>
 
             <form method="post" name="login-form" id="login-form">
