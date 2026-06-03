@@ -279,8 +279,8 @@ class LkhDashboardService
             ->map(fn (LKH $row) => [
                 'type' => 'lkh',
                 'tanggal' => Carbon::parse($row->tanggal)->locale('id')->translatedFormat('d M Y'),
-                'kegiatan' => \Illuminate\Support\Str::limit(strip_tags((string) $row->kegiatan), 80),
-                'output' => $row->output,
+                'kegiatan' => (string) $row->kegiatan,
+                'output' => (string) $row->output,
                 'url' => route('l-k-h.index'),
             ])
             ->all();

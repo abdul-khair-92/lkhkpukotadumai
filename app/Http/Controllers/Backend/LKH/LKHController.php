@@ -93,7 +93,50 @@ class LKHController extends Controller
 
         $filename = sprintf('LKH-%04d-%02d.pdf', $tahun, $bulan);
 
-        return $pdfService->makeSekretarisPdf($user, $bulan, $tahun)->download($filename);
+        return $pdfService->makeSekretarisPdf($user, $bulan, $tahun)->stream($filename);
+    }
+
+    public function uploadSekretarisKpu(Request $request, LkhPengajuanPdfService $pdfService)
+    {
+        $request->validate([
+            'bulan' => 'required',
+            'tahun' => 'required|digits:4',
+        ]);
+
+        $user = $request->user();
+
+        if ((int) $user->jabatan !== 1) {
+            abort(403, 'Fitur ini hanya untuk jabatan Sekretaris.');
+        }
+
+        $bulan = (int) $request->input('bulan');
+        $tahun = (int) $request->input('tahun');
+
+        $count = LKH::query()
+            ->where('user_id', $user->id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->count();
+
+        if ($count < 1) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Belum ada data LKH untuk periode yang dipilih.',
+            ]);
+        }
+
+        try {
+            $pdfService->uploadSekretarisLkhToKpuApi($user, $bulan, $tahun);
+            return response()->json([
+                'status' => true,
+                'message' => 'LKH berhasil diupload ke server KPU.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal upload LKH: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -244,6 +287,12 @@ class LKHController extends Controller
         $pengajuanUi = $this->pengajuanUiPayload($user, $monthFilter, $yearFilter);
 
         return datatables()->of($query)
+            ->editColumn('kegiatan', function ($data) {
+                return nl2br(e($data->kegiatan));
+            })
+            ->editColumn('output', function ($data) {
+                return nl2br(e($data->output));
+            })
             ->addColumn('action', function ($data) use ($user, $pengajuanByPeriod) {
                 $t = Carbon::parse($data->tanggal);
                 $key = $t->year.'-'.$t->month;
@@ -268,7 +317,7 @@ class LKHController extends Controller
             })
             ->addIndexColumn()
             ->with('pengajuan_ui', $pengajuanUi)
-            ->rawColumns(['action'])
+            ->rawColumns(['kegiatan', 'output', 'action'])
             ->make();
     }
 
@@ -462,12 +511,19 @@ class LKHController extends Controller
             'pdf_download_url' => $pdfUrl,
             'show_generate_pdf_button' => $isSekretaris && $hasLkhData && (bool) $user->read,
             'generate_pdf_url' => $generatePdfUrl,
+            'show_upload_kpu_button' => $isSekretaris && $hasLkhData && (bool) $user->create,
         ];
     }
 
     private function buildPengajuanStatusHtml(?LkhPengajuan $pengajuan): string
     {
+        $user = request()->user();
+        $isSekretaris = (int) ($user?->jabatan) === 1;
+
         if (! $pengajuan) {
+            if ($isSekretaris) {
+                return '';
+            }
             return '<span class="text-muted">Belum mengajukan laporan untuk periode ini.</span>';
         }
 

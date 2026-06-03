@@ -12,7 +12,7 @@
 		</div>
 		<div class='form-group'>
 			{!! html()->label()->class('control-label')->for('output')->text('Output') !!}
-			{!! html()->text('output',NULL)->placeholder('Type Output here')->class('form-control')->id('output') !!}
+			{!! html()->textarea('output',NULL)->placeholder('Ketik Output di sini')->class('form-control')->id('output')->attribute('rows', 3)->attribute('style', 'min-height:80px;') !!}
 		</div>
     </div>
 </div>

@@ -241,6 +241,60 @@ class LkhPengajuanPdfService
         }
     }
 
+    /**
+     * Upload the generated PDF file for Sekretaris to the KPU API.
+     *
+     * @throws \Exception
+     */
+    public function uploadSekretarisLkhToKpuApi(User $pegawai, int $bulan, int $tahun): void
+    {
+        $bulanLabel = $this->formatMonthLabel($bulan);
+        $periode = $bulanLabel . ' ' . $tahun;
+        $filename = 'LKH-' . $tahun . '-' . str_pad((string) $bulan, 2, '0', STR_PAD_LEFT) . '.pdf';
+
+        $pdf = $this->makeSekretarisPdf($pegawai, $bulan, $tahun);
+        
+        $subbagianList = config('master.app.subbagian', []);
+        $subbagianPegawai = $subbagianList[$pegawai->subbagian] ?? $pegawai->subbagian ?? '';
+        
+        $sourceId = 'sekretaris-' . $pegawai->id . '-' . $tahun . '-' . $bulan;
+        $docNumber = Str::random(48);
+
+        $payload = [
+            'appType' => 'bot',
+            'uploaderPhone' => '082385417036',
+            'caption' => 'LKH ' . ($pegawai->name ?? '') . ' - ' . $periode,
+            'description' => 'Laporan Kinerja Harian ' . ($pegawai->name ?? '') . ' Periode ' . $periode,
+            'docNumber' => $docNumber,
+            'docDate' => now()->toIso8601String(),
+            'unit' => (string) $subbagianPegawai,
+            'docKind' => 'LKH',
+            'unitSender' => (string) $subbagianPegawai,
+            'unitRecipient' => (string) $subbagianPegawai,
+            'title' => 'LKH - ' . ($pegawai->name ?? '') . ' - ' . $periode,
+            'subject' => 'Laporan Kinerja Harian',
+            'year' => (string) $tahun,
+            'category' => 'LKH',
+            'sourceType' => 'lkh_app',
+            'sourceId' => $sourceId,
+            'sourceName' => 'Sistem LKH',
+            'senderName' => $pegawai->name ?? '',
+        ];
+
+        $response = Http::withHeaders([
+            'X-Integration-Token' => 'itk_6a151911783679b9252e7812.kpJdqyVVAWIDlHHyqdF7e8Ft4RrEj-a1FaXfYavAznU',
+        ])->attach(
+            'file',
+            $pdf->output(),
+            $filename
+        )->post('https://serverkpu.fando.id/api/integrations/uploads', $payload);
+
+        if ($response->failed()) {
+            $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';
+            throw new \Exception('API Error: ' . $errorMessage);
+        }
+    }
+
     private function formatMonthLabel(int $bulan): string
     {
         try {

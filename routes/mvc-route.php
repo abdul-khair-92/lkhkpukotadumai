@@ -12,6 +12,7 @@ Route::group(['prefix' => config('mvc.route_prefix')], function () { // remove t
             Route::get('laporan-approved-pdf', 'LKH\LKHController@downloadApprovedPdf')->name('l-k-h.laporan-approved-pdf');
             Route::get('picker-config', 'LKH\LKHController@pickerConfig')->name('l-k-h.picker-config');
             Route::get('generate-pdf', 'LKH\LKHController@generatePdf')->name('l-k-h.generate-pdf');
+            Route::post('upload-kpu-sekretaris', 'LKH\LKHController@uploadSekretarisKpu')->name('l-k-h.upload-kpu-sekretaris');
         });
         Route::resource('l-k-h', 'LKH\LKHController');
         // end-l-k-h

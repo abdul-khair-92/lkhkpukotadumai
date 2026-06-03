@@ -47,9 +47,9 @@
                                         <span class="fa fa-file-pdf-o"></span> Laporan PDF
                                     </a>
                                     @if(!empty($is_sekretaris))
-                                        <a id="btn-generate-pdf-sekretaris" href="#" class="btn btn-info btn-sm" style="display: none;" target="_blank" rel="noopener" title="Generate PDF laporan LKH periode terpilih">
+                                        <button type="button" id="btn-generate-pdf-sekretaris" class="btn btn-info btn-sm" style="display: none;" title="Generate PDF laporan LKH periode terpilih">
                                             <span class="fa fa-file-pdf-o"></span> Generate PDF
-                                        </a>
+                                        </button>
                                     @endif
                                     @if($user->create && empty($hide_pengajuan_laporan))
                                         <button type="button" id="btn-pengajuan-laporan" class="btn btn-primary btn-sm">
@@ -111,6 +111,29 @@
             </section>
         </div>
     </div>
+
+    <!-- Modal Preview PDF Sekretaris -->
+    <div class="modal fade" id="modal-preview-pdf" tabindex="-1" role="dialog" aria-labelledby="modal-preview-pdf-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-preview-pdf-label">Preview LKH Sekretaris</h5>
+                    <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0" style="height: 75vh;">
+                    <iframe id="iframe-preview-pdf" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" id="btn-modal-upload-kpu" class="btn btn-warning">
+                        <span class="fa fa-cloud-upload"></span> Upload ke Server KPU
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script src="{{ url($template.'/assets/vendor_components/select2/dist/js/select2.js') }}"></script>
@@ -157,6 +180,64 @@
                         }
                     }).fail(function (xhr) {
                         var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan.';
+                        swal('Gagal', msg, 'error');
+                    });
+                });
+            });
+
+            $('#btn-generate-pdf-sekretaris').on('click', function (e) {
+                e.preventDefault();
+                var bulan = $('#filter-bulan').val();
+                var tahun = $('#filter-tahun').val();
+                if (!bulan || !tahun) {
+                    swal('Perhatian', 'Pilih bulan dan tahun terlebih dahulu.', 'warning');
+                    return;
+                }
+                
+                var url = $(this).attr('data-url') || $(this).data('url');
+                if (url) {
+                    $('#iframe-preview-pdf').attr('src', url);
+                    var modal = new bootstrap.Modal(document.getElementById('modal-preview-pdf'));
+                    modal.show();
+                }
+            });
+
+            $('#btn-modal-upload-kpu').on('click', function () {
+                var bulan = $('#filter-bulan').val();
+                var tahun = $('#filter-tahun').val();
+                if (!bulan || !tahun) {
+                    swal('Perhatian', 'Pilih bulan dan tahun tertentu (bukan Semua) sebelum upload ke server KPU.', 'warning');
+                    return;
+                }
+                swal({
+                    title: 'Upload ke Server KPU?',
+                    text: 'Laporan LKH periode bulan terpilih akan di-generate dan di-upload ke server KPU.',
+                    type: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Upload',
+                    cancelButtonText: 'Batal',
+                    showLoaderOnConfirm: true,
+                    closeOnConfirm: false
+                }, function (confirmed) {
+                    if (!confirmed) return;
+                    $.ajax({
+                        url: @json(route('l-k-h.upload-kpu-sekretaris')),
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: @json(csrf_token()),
+                            bulan: bulan,
+                            tahun: tahun
+                        }
+                    }).done(function (res) {
+                        if (res.status) {
+                            swal('Berhasil', res.message, 'success');
+                            $('#modal-preview-pdf').modal('hide');
+                        } else {
+                            swal('Gagal', res.message || 'Upload gagal', 'error');
+                        }
+                    }).fail(function (xhr) {
+                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan saat upload.';
                         swal('Gagal', msg, 'error');
                     });
                 });

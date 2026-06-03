@@ -431,9 +431,9 @@
                                                 <strong>{{ $item['tanggal'] }}</strong>
                                                 <span class="badge badge-success">Terisi</span>
                                             </div>
-                                            <p class="mb-0 mt-5 text-muted fs-13">{{ $item['kegiatan'] }}</p>
+                                            <p class="mb-0 mt-5 text-muted fs-13">{!! nl2br(e($item['kegiatan'])) !!}</p>
                                             @if(!empty($item['output']))
-                                                <small class="text-muted">Output: {{ $item['output'] }}</small>
+                                                <small class="text-muted">Output: {!! nl2br(e($item['output'])) !!}</small>
                                             @endif
                                         @endif
                                     </div>

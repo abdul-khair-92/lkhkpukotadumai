@@ -59,9 +59,9 @@ $(document).ready(function () {
 					var $genPdf = $('#btn-generate-pdf-sekretaris');
 					if ($genPdf.length) {
 						if (ui.show_generate_pdf_button && ui.generate_pdf_url) {
-							$genPdf.attr('href', ui.generate_pdf_url).show();
+							$genPdf.attr('data-url', ui.generate_pdf_url).show();
 						} else {
-							$genPdf.hide().attr('href', '#');
+							$genPdf.hide().removeAttr('data-url');
 						}
 					}
 				}
