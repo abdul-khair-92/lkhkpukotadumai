@@ -8,7 +8,6 @@ public/hot
 .env
 phpunit.xml
 docker-compose.yml
-docker/
 .dockerignore
 Dockerfile
 storage/*.key

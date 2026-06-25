@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Waiting for database..."
-while ! mysqladmin ping -h"db" --silent; do
+while ! mysqladmin ping -h"db" -uroot -p"${DB_PASSWORD}" --skip-ssl --silent; do
     sleep 1
 done
 
