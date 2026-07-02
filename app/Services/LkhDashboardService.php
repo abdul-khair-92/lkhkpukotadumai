@@ -24,13 +24,13 @@ class LkhDashboardService
      *     recent: list<array<string, mixed>>
      * }
      */
-    public function build(User $user): array
+    public function build(User $user, ?int $bulan = null, ?int $tahun = null): array
     {
         $user->loadMissing('access_group');
         $isAdministrator = $this->isAdministrator($user);
         $isAtasan = $user->canAccessLkhPengajuan() && ! $isAdministrator;
-        $bulan = (int) now()->format('m');
-        $tahun = (int) now()->format('Y');
+        $bulan = $bulan ?? (int) now()->format('m');
+        $tahun = $tahun ?? (int) now()->format('Y');
 
         return [
             'is_atasan' => $isAtasan,
@@ -132,10 +132,15 @@ class LkhDashboardService
                 $belumHariIni = $bawahanIds->diff($filledToday)->count();
             }
 
-            $pendingPengajuan = LkhPengajuan::query()
-                ->whereIn('user_id', $bawahanIds)
-                ->where('status', LkhPengajuan::STATUS_PENDING)
-                ->count();
+            $pendingPengajuanQuery = LkhPengajuan::query()
+                ->where('status', LkhPengajuan::STATUS_PENDING);
+
+            if (! in_array($user->access_group?->code ?? '', ['root', 'admin'], true)) {
+                $pendingPengajuanQuery->whereHas('user', function ($q) use ($user) {
+                    $q->where('atasan_id', $user->id);
+                });
+            }
+            $pendingPengajuan = $pendingPengajuanQuery->count();
         }
 
         $own = $this->buildPegawaiSummary($user, $bulan, $tahun);
@@ -197,12 +202,15 @@ class LkhDashboardService
             $belumHariIni = $bawahanIds->diff($filledToday)->count();
         }
 
-        $pendingPengajuan = $bawahanIds->isEmpty()
-            ? 0
-            : LkhPengajuan::query()
-                ->whereIn('user_id', $bawahanIds)
-                ->where('status', LkhPengajuan::STATUS_PENDING)
-                ->count();
+        $pendingPengajuanQuery = LkhPengajuan::query()
+            ->where('status', LkhPengajuan::STATUS_PENDING);
+
+        if (! in_array($user->access_group?->code ?? '', ['root', 'admin'], true)) {
+            $pendingPengajuanQuery->whereHas('user', function ($q) use ($user) {
+                $q->where('atasan_id', $user->id);
+            });
+        }
+        $pendingPengajuan = $pendingPengajuanQuery->count();
 
         return array_merge($pegawai, [
             'jumlah_bawahan' => $bawahanIds->count(),
@@ -298,11 +306,9 @@ class LkhDashboardService
 
         $user->loadMissing('access_group');
         if (! in_array($user->access_group?->code ?? '', ['root', 'admin'], true)) {
-            $bawahanIds = $this->scopedBawahanIds($user);
-            if ($bawahanIds->isEmpty()) {
-                return [];
-            }
-            $query->whereIn('user_id', $bawahanIds);
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('atasan_id', $user->id);
+            });
         }
 
         return $query->get()->map(function (LkhPengajuan $row) {

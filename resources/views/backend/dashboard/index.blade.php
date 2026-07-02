@@ -168,6 +168,20 @@
                                             @endif
                                         </p>
                                     </div>
+                                    <div class="col-auto">
+                                        <form method="GET" action="{{ url()->current() }}" class="d-flex align-items-center gap-2">
+                                            <select name="bulan" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                @foreach($list_bulan as $key => $val)
+                                                    <option value="{{ $key }}" {{ $filter_bulan == $key ? 'selected' : '' }}>{{ $val }}</option>
+                                                @endforeach
+                                            </select>
+                                            <select name="tahun" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                @foreach($list_tahun as $thn)
+                                                    <option value="{{ $thn }}" {{ $filter_tahun == $thn ? 'selected' : '' }}>{{ $thn }}</option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    </div>
                                     <div class="col-auto d-none d-md-block">
                                         <img class="welcome-img" src="{{ url($template.'/images/svg-icon/color-svg/lkh-dashboard.png') }}" alt="">
                                     </div>
@@ -205,31 +219,35 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="lkh-today-banner bg-info-light">
-                                        <h4 class="mb-5">Pegawai</h4>
-                                        <p class="mb-0 text-muted">{{ $today['date_label'] }}</p>
-                                        @if(($today['is_holiday'] ?? false))
-                                            <p class="mb-0 mt-10 text-muted">Hari libur — tidak ada target pengisian tim.</p>
-                                        @elseif(($today['jumlah_bawahan'] ?? 0) < 1)
-                                            <p class="mb-0 mt-10 text-muted">Tidak ada pegawai dalam cakupan tim.</p>
-                                        @elseif(($today['bawahan_belum_hari_ini'] ?? 0) > 0)
-                                            <p class="mb-0 mt-10 text-danger fw-600">
-                                                <i class="fa fa-users"></i>
-                                                {{ $today['bawahan_belum_hari_ini'] }} dari {{ $today['jumlah_bawahan'] }} pegawai belum mengisi hari ini
-                                            </p>
-                                        @else
-                                            <p class="mb-0 mt-10 text-success fw-600">
-                                                <i class="fa fa-check-circle"></i> Semua pegawai tim sudah mengisi hari ini
-                                            </p>
-                                        @endif
-                                        <div class="mt-15 d-flex flex-wrap gap-10">
-                                            @if(($today['pending_pengajuan'] ?? 0) > 0)
-                                                <a href="{{ $today['pengajuan_url'] }}" class="btn btn-warning btn-sm">
-                                                    {{ $today['pending_pengajuan'] }} pengajuan menunggu
-                                                </a>
-                                            @endif
-                                            @if(!empty($today['monitoring_url']))
-                                                <a href="{{ $today['monitoring_url'] }}" class="btn btn-outline-primary btn-sm">Monitoring LKH</a>
-                                            @endif
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-10">
+                                            <div>
+                                                <h4 class="mb-5">Pegawai</h4>
+                                                <p class="mb-0 text-muted">{{ $today['date_label'] }}</p>
+                                                @if(($today['is_holiday'] ?? false))
+                                                    <p class="mb-0 mt-10 text-muted">Hari libur — tidak ada target pengisian tim.</p>
+                                                @elseif(($today['jumlah_bawahan'] ?? 0) < 1)
+                                                    <p class="mb-0 mt-10 text-muted">Tidak ada pegawai dalam cakupan tim.</p>
+                                                @elseif(($today['bawahan_belum_hari_ini'] ?? 0) > 0)
+                                                    <p class="mb-0 mt-10 text-danger fw-600">
+                                                        <i class="fa fa-users"></i>
+                                                        {{ $today['bawahan_belum_hari_ini'] }} dari {{ $today['jumlah_bawahan'] }} pegawai belum mengisi hari ini
+                                                    </p>
+                                                @else
+                                                    <p class="mb-0 mt-10 text-success fw-600">
+                                                        <i class="fa fa-check-circle"></i> Semua pegawai tim sudah mengisi hari ini
+                                                    </p>
+                                                @endif
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-10">
+                                                @if(($today['pending_pengajuan'] ?? 0) > 0)
+                                                    <a href="{{ $today['pengajuan_url'] }}" class="btn btn-warning btn-sm">
+                                                        {{ $today['pending_pengajuan'] }} pengajuan menunggu
+                                                    </a>
+                                                @endif
+                                                @if(!empty($today['monitoring_url']))
+                                                    <a href="{{ $today['monitoring_url'] }}" class="btn btn-outline-primary btn-sm">Monitoring LKH</a>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

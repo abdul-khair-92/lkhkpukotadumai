@@ -85,7 +85,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $data = $this->model::findOrFail($id);
-        $atasanJabatan = [0, 1];
+        $atasanJabatan = [1, 2];
         $atasan = $this->model::whereNotNull('jabatan')
             ->where('jabatan', '!=', '')
             ->whereIn('jabatan', $atasanJabatan)
