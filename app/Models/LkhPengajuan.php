@@ -34,6 +34,7 @@ class LkhPengajuan extends Model
         'document_token',
         'qr_pengaju_token',
         'qr_penyetuju_token',
+        'api_archive_id',
     ];
 
     protected $casts = [

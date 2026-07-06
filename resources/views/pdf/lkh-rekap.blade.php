@@ -50,6 +50,17 @@
         .sig-gap { height: 60px; }
         .sig-name { font-weight: bold; text-decoration: underline; margin: 0 0 4px; }
         .sig-nip { margin: 0; }
+
+        /* Styles for Kop Surat */
+        table.kop-surat { width: 100%; border-bottom: 3px double #000; margin-bottom: 12px; }
+        table.kop-surat td { border: none !important; padding: 0 !important; }
+        table.kop-surat td.logo { width: 80px; text-align: center; vertical-align: middle; }
+        table.kop-surat td.logo img { width: 70px; height: auto; margin-bottom: 4px; }
+        table.kop-surat td.teks { text-align: center; vertical-align: middle; padding-right: 80px !important; }
+        .kop-surat .instansi { font-size: 14pt; }
+        .kop-surat .daerah { font-size: 14pt; }
+        .kop-surat .alamat { font-size: 8pt; margin-top: 2px; }
+        .kop-surat .kontak { font-size: 8pt; margin-top: 1px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -58,6 +69,23 @@
     $kasubbag = $sign['kasubbag'] ?? null;
     $sekretaris = $sign['sekretaris'] ?? null;
 @endphp
+
+<table class="kop-surat" cellspacing="0">
+    <tr>
+        <td class="logo">
+            @php $logoPath = public_path('eduadmin/images/KPU.svg'); @endphp
+            @if(file_exists($logoPath))
+                <img src="{{ $logoPath }}" alt="Logo KPU">
+            @endif
+        </td>
+        <td class="teks">
+            <div class="instansi">KOMISI PEMILIHAN UMUM</div>
+            <div class="daerah">KOTA DUMAI</div>
+            <div class="alamat">Alamat : Jl. Tuanku Tambusai No.- Kel. Bagan Besar Dumai</div>
+            <div class="kontak">Telp. (0765) 810322,810300 e-mail: kota_dumai@kpu.go.id</div>
+        </td>
+    </tr>
+</table>
 
 <div class="title">Rekap Laporan Kinerja Harian (LKH)</div>
 <div class="subtitle">{{ $month_name }}</div>
@@ -113,6 +141,15 @@
     <tr>
         <td>
             <div class="sig-block">
+                <p class="sig-label">Mengetahui,</p>
+                <div class="sig-title">{{ strtoupper($sign['sekretaris_title'] ?? 'Sekretaris') }}</div>
+                <div class="sig-gap"></div>
+                <div class="sig-name">{{ $sekretaris?->name ?? '................................' }}</div>
+                <p class="sig-nip">NIP. {{ $sekretaris?->nip ?? '................................' }}</p>
+            </div>
+        </td>
+        <td>
+            <div class="sig-block">
                 <p class="sig-label">Dibuat oleh,</p>
                 <div class="sig-title">{{ strtoupper($sign['kasubbag_title'] ?? 'Kepala Subbagian') }}</div>
                 @if(!empty($sign['kasubbag_subtitle']))
@@ -122,15 +159,6 @@
                 @endif
                 <div class="sig-name">{{ $kasubbag?->name ?? '................................' }}</div>
                 <p class="sig-nip">NIP. {{ $kasubbag?->nip ?? '................................' }}</p>
-            </div>
-        </td>
-        <td>
-            <div class="sig-block">
-                <p class="sig-label">Mengetahui,</p>
-                <div class="sig-title">{{ strtoupper($sign['sekretaris_title'] ?? 'Sekretaris') }}</div>
-                <div class="sig-gap"></div>
-                <div class="sig-name">{{ $sekretaris?->name ?? '................................' }}</div>
-                <p class="sig-nip">NIP. {{ $sekretaris?->nip ?? '................................' }}</p>
             </div>
         </td>
     </tr>

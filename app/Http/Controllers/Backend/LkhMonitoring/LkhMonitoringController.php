@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Backend\LkhMonitoring;
 use App\Http\Controllers\Controller;
 use App\Models\LKH;
 use App\Models\User;
+use App\Services\LkhHolidayService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class LkhMonitoringController extends Controller
 {
@@ -33,58 +35,78 @@ class LkhMonitoringController extends Controller
         ]);
     }
 
-    public function data(Request $request)
+    public function data(Request $request, LkhHolidayService $holidayService, int $bulan, int $tahun)
     {
         $auth = $request->user();
-        $bulan = (int) $request->input('bulan', now()->format('m'));
-        $tahun = (int) $request->input('tahun', now()->format('Y'));
+        $bulan = max(1, min(12, $bulan));
+        $daysInMonth = Carbon::create($tahun, $bulan, 1)->daysInMonth;
+        $monthName = Carbon::create($tahun, $bulan, 1)->locale('id')->translatedFormat('F Y');
+        $holidays = $holidayService->holidaysInMonth($bulan, $tahun);
 
-        $query = $this->scopedPegawaiQuery($auth);
+        $employees = $this->scopedPegawaiQuery($auth)
+            ->get()
+            ->sortBy(fn (User $u) => $u->name)
+            ->values();
 
-        $users = $query->get();
-        $userIds = $users->pluck('id')->all();
+        $userIds = $employees->pluck('id');
 
-        $lkhRows = LKH::query()
+        // Get LKH entries with kegiatan for tooltip
+        $filledByUser = LKH::query()
             ->whereIn('user_id', $userIds)
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal')
-            ->get(['user_id', 'tanggal'])
-            ->groupBy('user_id');
+            ->get(['user_id', 'tanggal', 'kegiatan', 'output'])
+            ->groupBy('user_id')
+            ->map(function (Collection $rows) {
+                return $rows->mapWithKeys(function ($row) {
+                    $day = (int) Carbon::parse($row->tanggal)->day;
 
-        return datatables()->of($query)
-            ->filterColumn('nama_pegawai', function (Builder $q, $keyword) {
-                $q->whereRaw(
-                    '(CONCAT(COALESCE(first_name,\'\'),\' \',COALESCE(last_name,\'\'))) like ?',
-                    ["%{$keyword}%"]
-                );
-            })
-            ->addColumn('nama_pegawai', fn ($row) => e($row->name))
-            ->addColumn('nip', fn ($row) => e($row->nip ?? '-'))
-            ->addColumn('jumlah_lkh', function ($row) use ($lkhRows) {
-                return (string) ($lkhRows->get($row->id)?->count() ?? 0);
-            })
-            ->addColumn('terakhir_input', function ($row) use ($lkhRows) {
-                $rows = $lkhRows->get($row->id);
-                if (! $rows || $rows->isEmpty()) {
-                    return '—';
+                    return [$day => [
+                        'kegiatan' => $row->kegiatan ?? '',
+                        'output' => $row->output ?? '',
+                    ]];
+                })->all();
+            });
+
+        $rows = [];
+        $no = 0;
+
+        foreach ($employees as $employee) {
+            $no++;
+            $filledDays = $filledByUser->get($employee->id, []);
+            $days = [];
+            $total = 0;
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $hasEntry = isset($filledDays[$day]);
+                $days[$day] = [
+                    'filled' => $hasEntry,
+                    'kegiatan' => $hasEntry ? ($filledDays[$day]['kegiatan'] ?? '') : '',
+                    'output' => $hasEntry ? ($filledDays[$day]['output'] ?? '') : '',
+                ];
+                $isHoliday = isset($holidays[$day]);
+                if ($hasEntry && ! $isHoliday) {
+                    $total++;
                 }
+            }
 
-                $last = $rows->max('tanggal');
+            $rows[] = [
+                'no' => $no,
+                'user_id' => $employee->id,
+                'name' => $employee->name,
+                'days' => $days,
+                'total' => $total,
+            ];
+        }
 
-                return Carbon::parse($last)->locale('id')->translatedFormat('d M Y');
-            })
-            ->addColumn('action', function ($row) use ($auth, $bulan, $tahun) {
-                $btn = '';
-                if ($auth->read) {
-                    $btn .= '<button type="button" class="btn btn-sm btn-outline btn-lihat-monitoring" data-id="'.e($row->id).'" data-bulan="'.e((string) $bulan).'" data-tahun="'.e((string) $tahun).'" title="Lihat detail"><i class="fa fa-list-alt text-primary"></i></button>';
-                }
-
-                return "<div class='btn-group'>".$btn.'</div>';
-            })
-            ->rawColumns(['action'])
-            ->addIndexColumn()
-            ->make();
+        return view($this->view.'.table', [
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'days_in_month' => $daysInMonth,
+            'month_name' => $monthName,
+            'holidays' => $holidays,
+            'rows' => $rows,
+        ]);
     }
 
     public function detail(Request $request, string $pegawaiId, int $bulan, int $tahun)

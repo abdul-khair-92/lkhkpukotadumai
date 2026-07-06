@@ -287,6 +287,9 @@ class LKHController extends Controller
         $pengajuanUi = $this->pengajuanUiPayload($user, $monthFilter, $yearFilter);
 
         return datatables()->of($query)
+            ->editColumn('tanggal', function ($data) {
+                return \Illuminate\Support\Carbon::parse($data->tanggal)->locale('id')->translatedFormat('l, d F Y');
+            })
             ->editColumn('kegiatan', function ($data) {
                 return nl2br(e($data->kegiatan));
             })
@@ -493,6 +496,10 @@ class LKHController extends Controller
             ? route('l-k-h.laporan-approved-pdf', ['bulan' => $monthFilter, 'tahun' => $yearFilter])
             : null;
 
+        $apiPdfUrl = ($showPdf && $p->api_archive_id)
+            ? route('lkh-pengajuan.api-pdf', ['id' => $p->id])
+            : null;
+
         $hasLkhData = LKH::query()
             ->where('user_id', $user->id)
             ->whereMonth('tanggal', (int) $monthFilter)
@@ -509,6 +516,7 @@ class LKHController extends Controller
             'status_html' => $statusHtml,
             'show_pdf_button' => $showPdf && (bool) $user->read,
             'pdf_download_url' => $pdfUrl,
+            'api_pdf_url' => $apiPdfUrl,
             'show_generate_pdf_button' => $isSekretaris && $hasLkhData && (bool) $user->read,
             'generate_pdf_url' => $generatePdfUrl,
             'show_upload_kpu_button' => $isSekretaris && $hasLkhData && (bool) $user->create,

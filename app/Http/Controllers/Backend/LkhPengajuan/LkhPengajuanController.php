@@ -135,7 +135,11 @@ class LkhPengajuanController extends Controller
         // Upload PDF ke API KPU (non-blocking: jika gagal, persetujuan tetap tersimpan)
         $uploadMessage = '';
         try {
-            $pdfService->uploadToKpuApi($pengajuan->fresh());
+            $archiveId = $pdfService->uploadToKpuApi($pengajuan->fresh());
+            if ($archiveId) {
+                $pengajuan->api_archive_id = $archiveId;
+                $pengajuan->save();
+            }
             $uploadMessage = ' PDF berhasil diunggah ke server KPU.';
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('LKH PDF: Upload ke API KPU gagal, PDF tetap tersimpan lokal.', [
@@ -148,6 +152,37 @@ class LkhPengajuanController extends Controller
         $this->notifyPegawai($pengajuan->fresh(['user']), 'approved');
 
         return response()->json(['status' => true, 'message' => 'Laporan disetujui dan PDF telah dibuat.' . $uploadMessage]);
+    }
+
+    public function streamApiPdf(Request $request, string $id)
+    {
+        $pengajuan = LkhPengajuan::findOrFail($id);
+        
+        if (!$pengajuan->api_archive_id) {
+            abort(404, 'File belum terunggah ke API KPU.');
+        }
+
+        // We assume pimpinan can view it, or the user who owns it.
+        $user = $request->user();
+        if (!in_array($user->access_group->code ?? '', ['root', 'admin'], true) && $pengajuan->user_id !== $user->id) {
+            $pengajuan->user->loadMissing('atasan');
+            if ($pengajuan->user->atasan_id !== $user->id) {
+                abort(403, 'Anda tidak berhak mengakses dokumen ini.');
+            }
+        }
+
+        $url = "https://serverkpu.fando.id/api/integrations/files/{$pengajuan->api_archive_id}?inline=1";
+        
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'X-Integration-Token' => 'itk_6a151911783679b9252e7812.kpJdqyVVAWIDlHHyqdF7e8Ft4RrEj-a1FaXfYavAznU',
+        ])->get($url);
+
+        if ($response->failed()) {
+            abort(404, 'File gagal dimuat dari API KPU.');
+        }
+
+        return response($response->body(), 200)
+            ->header('Content-Type', $response->header('Content-Type') ?? 'application/pdf');
     }
 
     public function revisi(Request $request, string $id)

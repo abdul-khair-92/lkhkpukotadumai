@@ -42,20 +42,6 @@
                             <div class="box-header">
                                 <h4 class="box-title">{!! $page->title ?? 'Page Name' !!}</h4>
                                 <div class="pull-right d-flex align-items-center flex-wrap justify-content-end" style="gap: 10px;">
-                                    <span id="lkh-status-pengajuan" class="text-end"></span>
-                                    <a id="btn-lihat-pdf-laporan" href="#" class="btn btn-info btn-sm" style="display: none;" target="_blank" rel="noopener" title="Unduh laporan PDF yang disetujui">
-                                        <span class="fa fa-file-pdf-o"></span> Laporan PDF
-                                    </a>
-                                    @if(!empty($is_sekretaris))
-                                        <button type="button" id="btn-generate-pdf-sekretaris" class="btn btn-info btn-sm" style="display: none;" title="Generate PDF laporan LKH periode terpilih">
-                                            <span class="fa fa-file-pdf-o"></span> Generate PDF
-                                        </button>
-                                    @endif
-                                    @if($user->create && empty($hide_pengajuan_laporan))
-                                        <button type="button" id="btn-pengajuan-laporan" class="btn btn-primary btn-sm">
-                                            <span class="fa fa-paper-plane"></span> Pengajuan Laporan
-                                        </button>
-                                    @endif
                                     @if($user->create)
                                         <button type="button" class="btn-action btn btn-success btn-sm" data-title="Tambah" data-action="create" data-url="{!! $page->url ?? '' !!}">
                                             <span class="fa fa-plus-circle"></span> Tambah Kegiatan
@@ -95,7 +81,7 @@
 									<thead>
 									<tr>
 										<th class="w-0">No</th>
-										<th>Tanggal</th>
+										<th>Hari/Tanggal</th>
 										<th>Kegiatan</th>
 										<th>Output</th>
 										<th class="text-center w-0">Action</th>
@@ -104,6 +90,25 @@
 									<tbody>
 									</tbody>
 								</table>
+                            </div>
+                            
+                            <div class="box-footer">
+                                <div class="d-flex align-items-center justify-content-end" style="gap: 10px;">
+                                    <span id="lkh-status-pengajuan" class="text-end"></span>
+                                    <a id="btn-lihat-pdf-laporan" href="#" class="btn btn-info" style="display: none;" target="_blank" rel="noopener" title="Unduh laporan PDF yang disetujui">
+                                        <span class="fa fa-file-pdf-o"></span> Laporan PDF
+                                    </a>
+                                    @if(!empty($is_sekretaris))
+                                        <button type="button" id="btn-generate-pdf-sekretaris" class="btn btn-info" style="display: none;" title="Generate PDF laporan LKH periode terpilih">
+                                            <span class="fa fa-file-pdf-o"></span> Generate PDF
+                                        </button>
+                                    @endif
+                                    @if($user->create && empty($hide_pengajuan_laporan))
+                                        <button type="button" id="btn-pengajuan-laporan" class="btn btn-primary">
+                                            <span class="fa fa-paper-plane"></span> Pengajuan Laporan
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -130,6 +135,25 @@
                     <button type="button" id="btn-modal-upload-kpu" class="btn btn-warning">
                         <span class="fa fa-cloud-upload"></span> Upload ke Server KPU
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Preview PDF Laporan (Pegawai) -->
+    <div class="modal fade" id="modal-preview-pdf-laporan" tabindex="-1" role="dialog" aria-labelledby="modal-preview-pdf-laporan-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-preview-pdf-laporan-label">Preview Laporan PDF</h5>
+                    <button type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0" style="height: 75vh;">
+                    <iframe id="iframe-preview-pdf-laporan" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -241,6 +265,16 @@
                         swal('Gagal', msg, 'error');
                     });
                 });
+            });
+
+            $('#btn-lihat-pdf-laporan').on('click', function(e) {
+                var url = $(this).attr('data-url');
+                if (url) {
+                    e.preventDefault();
+                    $('#iframe-preview-pdf-laporan').attr('src', url);
+                    var modal = new bootstrap.Modal(document.getElementById('modal-preview-pdf-laporan'));
+                    modal.show();
+                }
             });
         });
     </script>

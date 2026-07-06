@@ -34,8 +34,18 @@
     $qrMenyetujuiDataUri = $qrMenyetujuiDataUri ?? ($qrDataUri ?? null);
     $diajukanAt = $diajukanAt ?? ($pengajuan->created_at ?? null);
     $hideMenyetujuiAtasan = $hideMenyetujuiAtasan ?? false;
+
+    $periodeLabel = '';
+    if (isset($pengajuan) && $pengajuan) {
+        $periodeLabel = \Illuminate\Support\Carbon::createFromDate($pengajuan->tahun, $pengajuan->bulan, 1)->locale('id')->translatedFormat('F Y');
+    } elseif (isset($rows) && count($rows) > 0) {
+        $periodeLabel = \Illuminate\Support\Carbon::parse($rows[0]->tanggal)->locale('id')->translatedFormat('F Y');
+    }
 @endphp
 <div class="title">Laporan Kinerja Harian</div>
+@if($periodeLabel)
+<div class="subtitle" style="text-align: center; font-size: 10pt; margin-top: -3px; margin-bottom: 12px; font-weight: bold; text-transform: uppercase;">Periode {{ $periodeLabel }}</div>
+@endif
 
 <table class="meta">
     <tr>
@@ -56,7 +66,7 @@
     <thead>
     <tr>
         <th style="width:28px;">No</th>
-        <th style="width:72px;">Tanggal</th>
+        <th style="width:90px;">Hari/Tanggal</th>
         <th>Uraian tugas</th>
         <th style="width:120px;">Output</th>
     </tr>
@@ -65,7 +75,7 @@
     @foreach($rows as $i => $row)
         <tr>
             <td style="text-align:center;">{{ $i + 1 }}</td>
-            <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal)->locale('id')->translatedFormat('j/M/Y') }}</td>
+            <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal)->locale('id')->translatedFormat('l, d M Y') }}</td>
             <td>{!! nl2br(e($row->kegiatan)) !!}</td>
             <td>{{ $row->output }}</td>
         </tr>

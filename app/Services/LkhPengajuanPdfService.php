@@ -185,9 +185,10 @@ class LkhPengajuanPdfService
     /**
      * Upload the generated PDF file to the KPU API.
      *
+     * @return string|null
      * @throws \Exception
      */
-    public function uploadToKpuApi(LkhPengajuan $pengajuan): void
+    public function uploadToKpuApi(LkhPengajuan $pengajuan): ?string
     {
         if (!$pengajuan->pdf_path || !Storage::disk('public')->exists($pengajuan->pdf_path)) {
             throw new \Exception('File PDF tidak ditemukan di storage local.');
@@ -239,6 +240,8 @@ class LkhPengajuanPdfService
             $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';
             throw new \Exception('API Error: ' . $errorMessage);
         }
+
+        return $response->json('data.archive.archiveId');
     }
 
     /**

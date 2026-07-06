@@ -25,6 +25,8 @@ Route::group(['prefix' => config('mvc.route_prefix')], function () { // remove t
             Route::post('{id}/revisi', 'LkhPengajuan\LkhPengajuanController@revisi')->name('revisi');
             Route::post('{id}/batalkan', 'LkhPengajuan\LkhPengajuanController@batalkan')->name('batalkan');
         });
+        // Route api-pdf terpisah agar pegawai biasa bisa melihat PDF miliknya sendiri
+        Route::get('lkh-pengajuan/{id}/api-pdf', 'LkhPengajuan\LkhPengajuanController@streamApiPdf')->name('lkh-pengajuan.api-pdf');
         // end pengajuan LKH
         // rekap LKH
         Route::prefix('lkh-rekap')->as('lkh-rekap.')->group(function () {
@@ -43,7 +45,7 @@ Route::group(['prefix' => config('mvc.route_prefix')], function () { // remove t
         // monitoring LKH bawahan
         Route::prefix('lkh-monitoring')->as('lkh-monitoring.')->middleware('lkhMonitoringAccess')->group(function () {
             Route::get('/', 'LkhMonitoring\LkhMonitoringController@index')->name('index');
-            Route::get('data', 'LkhMonitoring\LkhMonitoringController@data')->name('data');
+            Route::get('data/{bulan}/{tahun}', 'LkhMonitoring\LkhMonitoringController@data')->name('data');
             Route::get('detail/{pegawaiId}/{bulan}/{tahun}', 'LkhMonitoring\LkhMonitoringController@detail')->name('detail');
         });
         // end monitoring LKH bawahan

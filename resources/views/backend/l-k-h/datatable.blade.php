@@ -50,10 +50,14 @@ $(document).ready(function () {
 					}
 					var $pdf = $('#btn-lihat-pdf-laporan');
 					if ($pdf.length) {
-						if (ui.show_pdf_button && ui.pdf_download_url) {
-							$pdf.attr('href', ui.pdf_download_url).show();
+						if (ui.show_pdf_button && (ui.pdf_download_url || ui.api_pdf_url)) {
+                            if (ui.api_pdf_url) {
+                                $pdf.attr('data-url', ui.api_pdf_url).attr('href', '#').removeAttr('target').show();
+                            } else {
+							    $pdf.attr('href', ui.pdf_download_url).attr('target', '_blank').removeAttr('data-url').show();
+                            }
 						} else {
-							$pdf.hide().attr('href', '#');
+							$pdf.hide().attr('href', '#').removeAttr('data-url');
 						}
 					}
 					var $genPdf = $('#btn-generate-pdf-sekretaris');

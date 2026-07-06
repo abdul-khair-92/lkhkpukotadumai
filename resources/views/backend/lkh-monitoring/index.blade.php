@@ -4,6 +4,41 @@
     <style>
         .modal-backdrop { z-index: 20000 !important; }
         .modal { z-index: 20010 !important; }
+
+        .monitoring-lkh-wrap { overflow-x: auto; }
+        .table-monitoring-lkh { font-size: 12px; min-width: 900px; }
+        .table-monitoring-lkh th,
+        .table-monitoring-lkh td { text-align: center; vertical-align: middle; padding: 4px 3px; white-space: nowrap; }
+        .table-monitoring-lkh th.col-nama,
+        .table-monitoring-lkh td.col-nama { text-align: left; min-width: 180px; white-space: normal; }
+        .table-monitoring-lkh th.col-no { width: 40px; }
+        .table-monitoring-lkh th.col-total { width: 50px; }
+        .table-monitoring-lkh th.col-day { width: 28px; min-width: 28px; }
+        .table-monitoring-lkh th.holiday-col,
+        .table-monitoring-lkh td.holiday-col { background-color: #fde8e8; }
+        .monitoring-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #28a745;
+            color: #fff;
+            font-size: 10px;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .monitoring-libur { font-size: 10px; font-weight: 600; color: #c0392b; }
+        .monitoring-empty { color: #999; }
+        #monitoring-loading { display: none; }
+
+        /* Tooltip styling for kegiatan */
+        .tooltip-inner {
+            max-width: 300px;
+            text-align: left;
+            white-space: pre-wrap;
+        }
     </style>
 @endpush
 @section('content')
@@ -27,46 +62,36 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="box">
-                            <div class="box-header">
-                                <h4 class="box-title">Daftar pegawai</h4>
-                            </div>
-                            <div class="box-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <label for="filter-bulan" class="form-label">Bulan</label>
-                                        <select id="filter-bulan" class="form-control select2">
+                            <div class="box-header d-flex flex-wrap align-items-center justify-content-between" style="gap: 10px;">
+                                <h4 class="box-title mb-0">Monitoring pengisian LKH</h4>
+                                <div class="d-flex flex-wrap align-items-end" style="gap: 10px;">
+                                    <div class="form-group mb-0">
+                                        <label for="filter-bulan" class="form-label mb-1">Bulan</label>
+                                        <select id="filter-bulan" class="form-control select2" style="min-width: 140px;">
                                             @foreach($list_bulan as $bulan => $label)
                                                 <option value="{{ $bulan }}" @selected((string) $bulan === (string) ($filter_default_bulan ?? ''))>{{ $label }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label for="filter-tahun" class="form-label">Tahun</label>
-                                        <select id="filter-tahun" class="form-control select2">
+                                    <div class="form-group mb-0">
+                                        <label for="filter-tahun" class="form-label mb-1">Tahun</label>
+                                        <select id="filter-tahun" class="form-control select2" style="min-width: 100px;">
                                             @foreach($list_tahun as $tahun)
                                                 <option value="{{ $tahun }}" @selected((string) $tahun === (string) ($filter_default_tahun ?? ''))>{{ $tahun }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-2" style="padding-top: 28px;">
-                                        <button id="btn-filter-monitoring" class="btn btn-primary btn-block" type="button">
-                                            <i class="fa fa-filter"></i> Filter
-                                        </button>
-                                    </div>
+                                    <button id="btn-filter-monitoring" type="button" class="btn btn-primary">
+                                        <i class="fa fa-filter"></i> Tampilkan
+                                    </button>
                                 </div>
-                                <table id="datatable-monitoring" class="table table-bordered table-striped" style="width: 100%;">
-                                    <thead>
-                                    <tr>
-                                        <th class="w-0">No</th>
-                                        <th>Nama pegawai</th>
-                                        <th>NIP</th>
-                                        <th>Jumlah LKH</th>
-                                        <th>Terakhir input</th>
-                                        <th class="text-center w-0">Aksi</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+                            </div>
+                            <div class="box-body">
+                                <div id="monitoring-loading" class="text-center py-4">
+                                    <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+                                    <p class="mt-2 text-muted">Memuat data monitoring...</p>
+                                </div>
+                                <div id="monitoring-table-container" class="monitoring-lkh-wrap"></div>
                             </div>
                         </div>
                     </div>
@@ -84,7 +109,42 @@
 @push('js')
     <script src="{{ url($template.'/assets/vendor_components/select2/dist/js/select2.js') }}"></script>
     <script src="{{ url($template.'/assets/vendor_components/sweetalert/sweetalert.min.js') }}"></script>
-    <script src="{{ url($template.'/assets/vendor_components/jquery-validation-1.17.0/lib/jquery.form.js') }}"></script>
-    <script src="{{ url($template.'/assets/vendor_components/datatable/datatables.min.js') }}"></script>
-    @include('backend.lkh-monitoring.datatable')
+    <script>
+        (function () {
+            var dataUrl = @json(url(config('mvc.route_prefix').'/lkh-monitoring/data'));
+
+            function loadMonitoring() {
+                var bulan = parseInt($('#filter-bulan').val(), 10);
+                var tahun = parseInt($('#filter-tahun').val(), 10);
+                if (!bulan || !tahun) return;
+
+                $('#monitoring-loading').show();
+                $('#monitoring-table-container').empty();
+
+                $.get(dataUrl + '/' + bulan + '/' + tahun)
+                    .done(function (html) {
+                        $('#monitoring-table-container').html(html);
+                        // Initialize Bootstrap tooltips on the checkmark icons
+                        $('[data-bs-toggle="tooltip"]').each(function () {
+                            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                                new bootstrap.Tooltip(this);
+                            }
+                        });
+                    })
+                    .fail(function () {
+                        $('#monitoring-table-container').html('<div class="alert alert-danger">Gagal memuat data monitoring. Silakan coba lagi.</div>');
+                    })
+                    .always(function () {
+                        $('#monitoring-loading').hide();
+                    });
+            }
+
+            $(function () {
+                $('#filter-bulan, #filter-tahun').select2({ width: '100%' });
+                $('#btn-filter-monitoring').on('click', loadMonitoring);
+                $('#filter-bulan, #filter-tahun').on('change', loadMonitoring);
+                loadMonitoring();
+            });
+        })();
+    </script>
 @endpush
