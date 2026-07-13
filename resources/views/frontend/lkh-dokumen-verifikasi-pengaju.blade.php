@@ -11,12 +11,16 @@
         .subtitle { font-size: .9rem; color: #666; margin: 0 0 16px; }
         dl { margin: 0; display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; font-size: .95rem; }
         dt { color: #666; }
-        dd { margin: 0; font-weight: 500; }
+        dd { margin: 0; font-weight: 500; word-break: break-word; }
         .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: .8rem; font-weight: 600; }
         .ok { background: #d4edda; color: #155724; }
         .pending { background: #fff3cd; color: #856404; }
         .other { background: #e2e3e5; color: #383d41; }
         .note { margin-top: 18px; padding: 12px; background: #e7f1ff; border-radius: 6px; font-size: .88rem; color: #084298; }
+        @media (max-width: 480px) {
+            dl { grid-template-columns: 1fr; gap: 4px; }
+            dt { margin-top: 8px; font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>

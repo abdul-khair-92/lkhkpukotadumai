@@ -1,4 +1,4 @@
-@if($page->announcement()->count() > 0)
+@if($page && $page->announcement()->count() > 0)
     <div id="content-announcement" class="mb-3 p-3">
         <h5 class="mb-3 text-secondary"><i class="fa fa-bullhorn me-2"></i> Pengumuman Terbaru</h5>
         <ul class="list-group">

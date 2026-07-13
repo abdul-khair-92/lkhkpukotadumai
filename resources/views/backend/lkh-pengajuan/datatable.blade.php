@@ -64,8 +64,12 @@ $(document).ready(function () {
                 url: url,
                 type: 'POST',
                 dataType: 'json',
-                data: { _token: csrf }
+                data: { _token: csrf },
+                beforeSend: function () {
+                    $.showLoading();
+                }
             }).done(function (res) {
+                $.hideLoading();
                 if (res.status) {
                     swal('Berhasil', res.message, 'success');
                     table.ajax.reload(null, false);
@@ -73,6 +77,7 @@ $(document).ready(function () {
                     swal('Gagal', res.message || 'Gagal menyetujui', 'error');
                 }
             }).fail(function (xhr) {
+                $.hideLoading();
                 var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan.';
                 swal('Gagal', msg, 'error');
             });
@@ -97,8 +102,12 @@ $(document).ready(function () {
             url: url,
             type: 'POST',
             dataType: 'json',
-            data: { _token: csrf, catatan_atasan: catatan }
+            data: { _token: csrf, catatan_atasan: catatan },
+            beforeSend: function () {
+                $.showLoading();
+            }
         }).done(function (res) {
+            $.hideLoading();
             if (res.status) {
                 $('#modal-revisi-lkh').modal('hide');
                 swal('Berhasil', res.message, 'success');
@@ -107,6 +116,7 @@ $(document).ready(function () {
                 swal('Gagal', res.message || 'Gagal mengirim revisi', 'error');
             }
         }).fail(function (xhr) {
+            $.hideLoading();
             var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan.';
             if (xhr.responseJSON && xhr.responseJSON.errors && xhr.responseJSON.errors.catatan_atasan) {
                 msg = xhr.responseJSON.errors.catatan_atasan[0];
@@ -131,8 +141,12 @@ $(document).ready(function () {
                 url: url,
                 type: 'POST',
                 dataType: 'json',
-                data: { _token: csrf }
+                data: { _token: csrf },
+                beforeSend: function () {
+                    $.showLoading();
+                }
             }).done(function (res) {
+                $.hideLoading();
                 if (res.status) {
                     swal('Berhasil', res.message, 'success');
                     table.ajax.reload(null, false);
@@ -140,6 +154,7 @@ $(document).ready(function () {
                     swal('Gagal', res.message || 'Gagal membatalkan', 'error');
                 }
             }).fail(function (xhr) {
+                $.hideLoading();
                 var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan.';
                 swal('Gagal', msg, 'error');
             });

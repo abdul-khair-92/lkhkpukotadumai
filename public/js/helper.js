@@ -90,7 +90,6 @@ $(function () {
     $(document).on('change', 'input[type="file"]', function () {
         clearError();
         let id = $(this).attr('id');
-        q
         let size = $(this).data('size') || 0;
         let max_byte = size * 1024;
         if (!$(this).attr('accept')) return;

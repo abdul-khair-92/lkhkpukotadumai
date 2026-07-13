@@ -72,15 +72,16 @@
                 </li>
                 <li class="dropdown user user-menu">
                     <a href="#" class="waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" title="User">
-                        <i class="icon-User"><span class="path1"></span><span class="path2"></span></i>
+                        @if(auth()->user()->photo)
+                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="User" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover; margin-top: -5px;">
+                        @else
+                            <i class="icon-User"><span class="path1"></span><span class="path2"></span></i>
+                        @endif
                     </a>
                     <ul class="dropdown-menu animated flipInX">
                         <li class="user-body">
-                            <a class="dropdown-item btn-action text-center" href="#" data-action="edit"
-                               data-url="{{ url(config('master.app.url.backend').'/user') }}" data-title="Profil User"
-                               data-id="{{ $user->id }}">
-                                <i class="ti-user text-muted me-2"></i>{!! $user->name !!}<br>
-                                <span class="fs-12">( {{ $user->level->name }} )</span>
+                            <a class="dropdown-item text-center" href="{{ route('profile.index') }}">
+                                <i class="ti-user text-muted me-2"></i>Profil Saya
                             </a>
                             <div class="dropdown-divider"></div>
                         </li>

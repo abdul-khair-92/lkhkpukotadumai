@@ -17,3 +17,8 @@ Route::get('login', 'Backend\Auth\AuthController@formLogin')->name('login');
 Route::get('register', 'Backend\Auth\AuthController@formRegister')->name('register');
 Route::post('sign-in', 'Backend\Auth\AuthController@login')->name('sign-in');
 Route::post('sign-up', 'Backend\Auth\AuthController@register')->name('sign-up');
+
+Route::middleware(['auth', 'backend'])->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\Backend\ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile/photo', [\App\Http\Controllers\Backend\ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
+});

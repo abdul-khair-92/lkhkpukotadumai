@@ -71,7 +71,7 @@ $(window.document).on('click', '.btn-action', function (e) {
     const modalId = $(this).data('modalId') ?? 'modal-master';
     const modalSize = $(this).data('size') ?? 'modal-lg';
     const bgClass = $(this).data('bgClass') ?? 'bg-default';
-    const arguments = $(this).data('options') ?? '';
+    const urlArgs = $(this).data('options') ?? '';
     const _targetTable = $(this).data('table') ?? '';
     const _targetFunction = $(this).data('function') ?? '';
     const actionUrls = {
@@ -82,7 +82,7 @@ $(window.document).on('click', '.btn-action', function (e) {
     };
     const urlExtension = actionUrls[action] || '';
     const modalOptions = {
-        url: urlExtension ? `${url}/${urlExtension}${arguments}` : url+`${arguments}`,
+        url: urlExtension ? `${url}/${urlExtension}${urlArgs}` : url+`${urlArgs}`,
         id: modalId,
         dlgClass: 'fade',
         bgClass: bgClass,
@@ -104,7 +104,11 @@ $(window.document).on('click', '.btn-action', function (e) {
                 $.hideLoading();
                 $(`#${modalId}`).modal('show');
                 if (_targetTable) {
-                    _targetTable.split(',').forEach((tableId) => $(`#${tableId}`).DataTable().ajax.reload());
+                    _targetTable.split(',').forEach((tableId) => {
+                        if ($(`#${tableId}`).length && $.fn.DataTable.isDataTable(`#${tableId}`)) {
+                            $(`#${tableId}`).DataTable().ajax.reload();
+                        }
+                    });
                 }
                 if (_targetFunction) {
                     targetFunction(_targetFunction);
@@ -185,7 +189,9 @@ $(window.document).on('click', '.submit-data', function (e) {
 
                 if (_targetTable) {
                     _targetTable.split(',').forEach((tableId) => {
-                        $(`#${tableId}`).DataTable().ajax.reload();
+                        if ($(`#${tableId}`).length && $.fn.DataTable.isDataTable(`#${tableId}`)) {
+                            $(`#${tableId}`).DataTable().ajax.reload();
+                        }
                     });
                 }
 
