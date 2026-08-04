@@ -209,7 +209,7 @@ class LkhPengajuanPdfService
 
         $payload = [
             'appType' => 'bot',
-            'uploaderPhone' => '082385417036',
+            'uploaderPhone' => config('services.fando.uploader_phone'),
             'caption' => 'LKH ' . ($pegawai?->name ?? '') . ' - ' . $periode,
             'description' => 'Laporan Kinerja Harian ' . ($pegawai?->name ?? '') . ' Periode ' . $periode,
             'docNumber' => $pengajuan->document_token ?? $pengajuan->id,
@@ -229,12 +229,12 @@ class LkhPengajuanPdfService
         ];
 
         $response = Http::withHeaders([
-            'X-Integration-Token' => 'itk_6a151911783679b9252e7812.kpJdqyVVAWIDlHHyqdF7e8Ft4RrEj-a1FaXfYavAznU',
+            'X-Integration-Token' => config('services.fando.api_key'),
         ])->attach(
             'file',
             Storage::disk('public')->get($pengajuan->pdf_path),
             $filename
-        )->post('https://serverkpu.fando.id/api/integrations/uploads', $payload);
+        )->post(rtrim(config('services.fando.base_url'), '/') . '/api/integrations/uploads', $payload);
 
         if ($response->failed()) {
             $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';
@@ -265,7 +265,7 @@ class LkhPengajuanPdfService
 
         $payload = [
             'appType' => 'bot',
-            'uploaderPhone' => '082385417036',
+            'uploaderPhone' => config('services.fando.uploader_phone'),
             'caption' => 'LKH ' . ($pegawai->name ?? '') . ' - ' . $periode,
             'description' => 'Laporan Kinerja Harian ' . ($pegawai->name ?? '') . ' Periode ' . $periode,
             'docNumber' => $docNumber,
@@ -285,12 +285,12 @@ class LkhPengajuanPdfService
         ];
 
         $response = Http::withHeaders([
-            'X-Integration-Token' => 'itk_6a151911783679b9252e7812.kpJdqyVVAWIDlHHyqdF7e8Ft4RrEj-a1FaXfYavAznU',
+            'X-Integration-Token' => config('services.fando.api_key'),
         ])->attach(
             'file',
             $pdf->output(),
             $filename
-        )->post('https://serverkpu.fando.id/api/integrations/uploads', $payload);
+        )->post(rtrim(config('services.fando.base_url'), '/') . '/api/integrations/uploads', $payload);
 
         if ($response->failed()) {
             $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';

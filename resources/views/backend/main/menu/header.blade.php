@@ -81,7 +81,10 @@
                     <ul class="dropdown-menu animated flipInX">
                         <li class="user-body">
                             <a class="dropdown-item text-center" href="{{ route('profile.index') }}">
-                                <i class="ti-user text-muted me-2"></i>Profil Saya
+                                <i class="ti-user text-muted me-2"></i>Ubah Foto Profil
+                            </a>
+                            <a class="dropdown-item text-center" href="{{ route('api-docs.index') }}">
+                                <i class="ti-book text-muted me-2"></i>Lihat API Docs
                             </a>
                             <div class="dropdown-divider"></div>
                         </li>

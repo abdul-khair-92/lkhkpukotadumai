@@ -44,7 +44,7 @@
                 <tr>
                     <td>{{ $row->tanggal }}</td>
                     <td>{!! nl2br(e($row->kegiatan)) !!}</td>
-                    <td>{{ $row->output }}</td>
+                    <td>{!! nl2br(e($row->output)) !!}</td>
                 </tr>
             @empty
                 <tr>

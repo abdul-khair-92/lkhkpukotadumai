@@ -7,8 +7,8 @@
         .title { text-align: center; font-weight: bold; font-size: 12pt; margin-bottom: 14px; text-transform: uppercase; }
         .meta { margin-bottom: 12px; line-height: 1.5; }
         .meta td { padding: 2px 8px 2px 0; vertical-align: top; }
-        table.data { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 8.5pt; }
-        table.data th, table.data td { border: 1px solid #333; padding: 4px 5px; vertical-align: top; }
+        table.data { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 8.5pt; table-layout: fixed; }
+        table.data th, table.data td { border: 1px solid #333; padding: 4px 5px; vertical-align: top; word-wrap: break-word; }
         table.data th { background: #eee; text-align: center; font-weight: bold; }
         .footer-wrap { width: 100%; margin-top: 10px; font-size: 9pt; border-collapse: collapse; }
         .footer-wrap td { vertical-align: top; padding: 8px 6px; }
@@ -66,7 +66,7 @@
     <thead>
     <tr>
         <th style="width:28px;">No</th>
-        <th style="width:90px;">Hari/Tanggal</th>
+        <th style="width:70px;">Hari/Tanggal</th>
         <th>Uraian tugas</th>
         <th style="width:120px;">Output</th>
     </tr>
@@ -77,7 +77,7 @@
             <td style="text-align:center;">{{ $i + 1 }}</td>
             <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal)->locale('id')->translatedFormat('l, d M Y') }}</td>
             <td>{!! nl2br(e($row->kegiatan)) !!}</td>
-            <td>{{ $row->output }}</td>
+            <td>{!! nl2br(e($row->output)) !!}</td>
         </tr>
     @endforeach
     </tbody>

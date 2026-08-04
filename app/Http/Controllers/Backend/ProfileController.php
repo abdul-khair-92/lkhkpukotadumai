@@ -14,6 +14,11 @@ class ProfileController extends Controller
         return view('backend.profile.index');
     }
 
+    public function apiDocs()
+    {
+        return view('backend.api-docs.index');
+    }
+
     public function updatePhoto(Request $request)
     {
         $request->validate([

@@ -81,7 +81,7 @@
 									<thead>
 									<tr>
 										<th class="w-0">No</th>
-										<th>Hari/Tanggal</th>
+										<th style="width: 110px;">Hari/Tanggal</th>
 										<th>Kegiatan</th>
 										<th>Output</th>
 										<th class="text-center w-0">Action</th>

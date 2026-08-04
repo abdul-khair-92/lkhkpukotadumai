@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'fando' => [
+        'base_url' => env('FANDO_BASE_URL', 'https://serverkpu.fando.id'),
+        'api_key' => env('FANDO_API_KEY'),
+        'uploader_phone' => env('FANDO_UPLOADER_PHONE'),
+    ],
+
 ];
