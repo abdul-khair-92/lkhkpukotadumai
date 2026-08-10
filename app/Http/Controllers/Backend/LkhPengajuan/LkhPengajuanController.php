@@ -120,6 +120,7 @@ class LkhPengajuanController extends Controller
                 $pengajuan->catatan_atasan = null;
                 $pengajuan->reviewed_by = $request->user()->id;
                 $pengajuan->reviewed_at = now();
+                $pengajuan->api_archive_id = null;
                 $pengajuan->save();
                 $pdfService->regenerateAndStore($pengajuan->fresh());
             });

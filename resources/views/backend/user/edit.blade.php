@@ -23,7 +23,7 @@
             <div class="col-md-6 form-group">
                 {!! html()->label('Jabatan','jabatan')->class('control-label') !!}
                 <span class="text-dark"></span>
-                {!! html()->select('jabatan', config('master.app.jabatan'), $data->jabatan)->class('form-control select2')->id('jabatan')->required() !!}
+                {!! html()->select('jabatan', $jabatan_list, $data->jabatan)->class('form-control select2')->id('jabatan')->required() !!}
             </div>
             <div class="col-md-6 form-group">
                 {!! html()->label('Subbagian','subbagian')->class('control-label') !!}

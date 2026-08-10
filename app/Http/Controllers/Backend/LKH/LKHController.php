@@ -211,6 +211,7 @@ class LKHController extends Controller
         $pengajuan->catatan_atasan = null;
         $pengajuan->reviewed_by = null;
         $pengajuan->reviewed_at = null;
+        $pengajuan->api_archive_id = null;
         $pengajuan->save();
 
         if (! empty($user->atasan_id)) {
@@ -256,7 +257,10 @@ class LKHController extends Controller
 
         $filename = 'LKH-'.$pengajuan->tahun.'-'.str_pad((string) $pengajuan->bulan, 2, '0', STR_PAD_LEFT).'.pdf';
 
-        return Storage::disk('public')->download($pengajuan->pdf_path, $filename);
+        return Storage::disk('public')->response($pengajuan->pdf_path, $filename, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
+        ]);
     }
 
     public function create()

@@ -22,7 +22,6 @@
         .qr { margin-top: 10px; text-align: center; }
         .qr img { display: inline-block; margin: 0 auto; }
         .qr-caption { font-size: 7.5pt; color: #555; margin-top: 4px; text-align: center; }
-        .place-date { text-align: right; margin-bottom: 8px; font-size: 9pt; }
     </style>
 </head>
 <body>
@@ -58,17 +57,23 @@
     </tr>
     <tr>
         <td><strong>JABATAN</strong></td>
-        <td>: {{ $jabatanPegawai }}@if(!$hideMenyetujuiAtasan && $subbagianPegawai && $subbagianPegawai !== '—') - {{ $subbagianPegawai }}@endif</td>
+        <td>: {{ $jabatanPegawai }}</td>
     </tr>
+    @if(!$hideMenyetujuiAtasan && $subbagianPegawai && $subbagianPegawai !== '—')
+    <tr>
+        <td><strong>SUB BAGIAN</strong></td>
+        <td>: {{ $subbagianPegawai }}</td>
+    </tr>
+    @endif
 </table>
 
 <table class="data">
     <thead>
     <tr>
-        <th style="width:28px;">No</th>
-        <th style="width:70px;">Hari/Tanggal</th>
-        <th>Uraian tugas</th>
-        <th style="width:120px;">Output</th>
+        <th style="width:5%;">No</th>
+        <th style="width:20%;">Hari/Tanggal</th>
+        <th style="width:45%;">Uraian tugas</th>
+        <th style="width:30%;">Output</th>
     </tr>
     </thead>
     <tbody>
@@ -83,14 +88,13 @@
     </tbody>
 </table>
 
-<div class="place-date">{{ $kotaSurat }}, {{ $approvedAt->locale('id')->translatedFormat('d F Y') }}</div>
-
 <table class="footer-wrap" cellspacing="0">
     <tr>
         @if($hideMenyetujuiAtasan)
             {{-- Kolom kiri kosong agar tanda tangan di sebelah kanan --}}
             <td class="col-pegawai" style="width:50%;">&nbsp;</td>
             <td class="col-menyetujui" style="width:50%;">
+                <div style="margin-bottom: 8px;">{{ $kotaSurat }}, {{ $approvedAt->locale('id')->translatedFormat('d F Y') }}</div>
                 <div class="sig-title"></div>
                 <div>{{ strtoupper($jabatanPegawai) }}</div>
                 @if(!empty($qrPegawaiDataUri))
@@ -102,6 +106,8 @@
             </td>
         @else
             <td class="col-pegawai">
+                <div style="margin-bottom: 8px;">&nbsp;</div>
+                <div style="margin-bottom: 2px;">&nbsp;</div>
                 <div class="sig-title"></div>
                 <div>{{ strtoupper($jabatanPegawai) }}</div>
                 @if($subbagianPegawai && $subbagianPegawai !== '—')
@@ -115,6 +121,7 @@
                 <div>NIP. {{ $pegawai?->nip ?? '—' }}</div>
             </td>
             <td class="col-menyetujui">
+                <div style="margin-bottom: 8px;">{{ $kotaSurat }}, {{ $approvedAt->locale('id')->translatedFormat('d F Y') }}</div>
                 <div class="sig-title">MENYETUJUI ATASAN LANGSUNG</div>
                 <div>{{ strtoupper($jabatanMenyetujui) }}</div>
                 @if(! $menyetujuiTanpaSubbagian && $subbagianMenyetujui && $subbagianMenyetujui !== '—')

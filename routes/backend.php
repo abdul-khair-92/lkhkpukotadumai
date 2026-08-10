@@ -69,6 +69,13 @@ Route::group(['prefix'=>config('master.app.url.backend')], function () {
         });
         Route::resource('faq', "Faq\FaqController");
         //end-faq
+    	//jabatan
+		Route::prefix('jabatan')->as('jabatan')->group(function () {
+			Route::get('data', 'Jabatan\JabatanController@data');
+			Route::get('delete/{id}', 'Jabatan\JabatanController@delete');
+		});
+		Route::resource('jabatan', 'Jabatan\JabatanController');
+		//end-jabatan
     	//announcement
 		Route::prefix('announcement')->as('announcement')->group(function () {
 			Route::get('data', 'Announcement\AnnouncementController@data');
@@ -83,6 +90,14 @@ Route::group(['prefix'=>config('master.app.url.backend')], function () {
 		});
 		Route::resource('notification', 'Notification\NotificationController');
 		//end-notification
+
+        // lkh-pegawai-pdf
+        Route::prefix('lkh-pegawai-pdf')->as('lkh-pegawai-pdf')->group(function () {
+            Route::get('data', 'LkhPegawaiPdf\LkhPegawaiPdfController@data')->name('.data');
+            Route::get('view-pdf/{id}', 'LkhPegawaiPdf\LkhPegawaiPdfController@viewPdf')->name('.view-pdf');
+        });
+        Route::resource('lkh-pegawai-pdf', 'LkhPegawaiPdf\LkhPegawaiPdfController')->only(['index']);
+        // end lkh-pegawai-pdf
 	});
 });
 

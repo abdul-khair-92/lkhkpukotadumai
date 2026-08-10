@@ -5,7 +5,7 @@
         .modal-backdrop { z-index: 20000 !important; }
         .modal { z-index: 20010 !important; }
 
-        .monitoring-lkh-wrap { overflow-x: auto; }
+        .monitoring-lkh-wrap { overflow: auto; max-height: 65vh; }
         .table-monitoring-lkh { font-size: 12px; min-width: 900px; }
         .table-monitoring-lkh th,
         .table-monitoring-lkh td { text-align: center; vertical-align: middle; padding: 4px 3px; white-space: nowrap; }

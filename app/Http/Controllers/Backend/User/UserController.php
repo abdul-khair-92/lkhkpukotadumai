@@ -25,8 +25,10 @@ class UserController extends Controller
         $atasan = $atasan->prepend('- Pilih Atasan -', '');
         $level = Level::filterLevel()->pluck('name', 'id');
         $access_group = AccessGroup::filterLevel()->pluck('name', 'id');
+        $jabatan_list = \App\Models\Jabatan::pluck('name', 'id');
+        $jabatan_list = $jabatan_list->prepend('- Pilih Jabatan -', '');
 
-        return view($this->view.'.create', compact('atasan', 'level', 'access_group'));
+        return view($this->view.'.create', compact('atasan', 'level', 'access_group', 'jabatan_list'));
     }
 
     public function data(Request $request)
@@ -95,8 +97,10 @@ class UserController extends Controller
         $atasan = $atasan->prepend('- Pilih Atasan -', '');
         $level = Level::filterLevel()->pluck('name', 'id');
         $access_group = AccessGroup::filterLevel()->pluck('name', 'id');
+        $jabatan_list = \App\Models\Jabatan::pluck('name', 'id');
+        $jabatan_list = $jabatan_list->prepend('- Pilih Jabatan -', '');
 
-        return view($this->view.'.edit', compact('data', 'atasan', 'level', 'access_group'));
+        return view($this->view.'.edit', compact('data', 'atasan', 'level', 'access_group', 'jabatan_list'));
     }
 
     public function update(Request $request, $id)

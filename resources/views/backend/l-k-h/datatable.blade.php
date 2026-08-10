@@ -51,11 +51,8 @@ $(document).ready(function () {
 					var $pdf = $('#btn-lihat-pdf-laporan');
 					if ($pdf.length) {
 						if (ui.show_pdf_button && (ui.pdf_download_url || ui.api_pdf_url)) {
-                            if (ui.api_pdf_url) {
-                                $pdf.attr('data-url', ui.api_pdf_url).attr('href', '#').removeAttr('target').show();
-                            } else {
-							    $pdf.attr('href', ui.pdf_download_url).attr('target', '_blank').removeAttr('data-url').show();
-                            }
+                            var targetUrl = ui.api_pdf_url ? ui.api_pdf_url : ui.pdf_download_url;
+                            $pdf.attr('data-url', targetUrl).attr('href', '#').removeAttr('target').show();
 						} else {
 							$pdf.hide().attr('href', '#').removeAttr('data-url');
 						}

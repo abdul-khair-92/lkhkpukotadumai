@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->belongsTo(Level::class);
     }
 
+    public function jabatan_model(): BelongsTo
+    {
+        return $this->belongsTo(Jabatan::class, 'jabatan', 'id');
+    }
+
     public function access_group(): object
     {
         return $this->belongsTo(AccessGroup::class);

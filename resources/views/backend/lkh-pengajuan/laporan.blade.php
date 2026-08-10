@@ -34,7 +34,7 @@
         <table class="table table-bordered table-striped table-sm">
             <thead>
             <tr>
-                <th style="width:120px;">Tanggal</th>
+                <th style="width:150px;">Hari/Tanggal</th>
                 <th>Kegiatan</th>
                 <th>Output</th>
             </tr>
@@ -42,7 +42,7 @@
             <tbody>
             @forelse($rows as $row)
                 <tr>
-                    <td>{{ $row->tanggal }}</td>
+                    <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal)->locale('id')->translatedFormat('l, d M Y') }}</td>
                     <td>{!! nl2br(e($row->kegiatan)) !!}</td>
                     <td>{!! nl2br(e($row->output)) !!}</td>
                 </tr>

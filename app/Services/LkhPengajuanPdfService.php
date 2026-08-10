@@ -46,7 +46,7 @@ class LkhPengajuanPdfService
 
         $approvedAt = $pengajuan->reviewed_at ?? now();
 
-        $jabatanList = config('master.app.jabatan', []);
+        $jabatanList = \App\Models\Jabatan::pluck('name', 'id')->toArray();
         $subbagianList = config('master.app.subbagian', []);
 
         $jabatanPegawai = $this->labelFromList($jabatanList, $pegawai?->jabatan);
@@ -126,7 +126,7 @@ class LkhPengajuanPdfService
         mixed $diajukanAt,
         bool $hideMenyetujuiAtasan,
     ): array {
-        $jabatanList = config('master.app.jabatan', []);
+        $jabatanList = \App\Models\Jabatan::pluck('name', 'id')->toArray();
         $subbagianList = config('master.app.subbagian', []);
 
         $jabatanPegawai = $this->labelFromList($jabatanList, $pegawai?->jabatan);
@@ -209,7 +209,7 @@ class LkhPengajuanPdfService
 
         $payload = [
             'appType' => 'bot',
-            'uploaderPhone' => config('services.fando.uploader_phone'),
+            'uploaderPhone' => '082385417036',
             'caption' => 'LKH ' . ($pegawai?->name ?? '') . ' - ' . $periode,
             'description' => 'Laporan Kinerja Harian ' . ($pegawai?->name ?? '') . ' Periode ' . $periode,
             'docNumber' => $pengajuan->document_token ?? $pengajuan->id,
@@ -228,13 +228,15 @@ class LkhPengajuanPdfService
             'senderName' => $pegawai?->name ?? '',
         ];
 
-        $response = Http::withHeaders([
-            'X-Integration-Token' => config('services.fando.api_key'),
+        $response = Http::withOptions([
+            'version' => 1.1, // Force HTTP/1.1 to prevent cURL error 18 with HTTP/2
+        ])->withHeaders([
+            'X-Integration-Token' => 'itk_6a151911783679b9252c7812.kpJdqyVVAMID1HHyqdF7o8Ft4RrEj-a1FaXFYavAznU',
         ])->attach(
             'file',
-            Storage::disk('public')->get($pengajuan->pdf_path),
+            fopen(Storage::disk('public')->path($pengajuan->pdf_path), 'r'),
             $filename
-        )->post(rtrim(config('services.fando.base_url'), '/') . '/api/integrations/uploads', $payload);
+        )->post('https://serverkpu.fando.id/api/integrations/uploads', $payload);
 
         if ($response->failed()) {
             $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';
@@ -265,7 +267,7 @@ class LkhPengajuanPdfService
 
         $payload = [
             'appType' => 'bot',
-            'uploaderPhone' => config('services.fando.uploader_phone'),
+            'uploaderPhone' => '082385417036',
             'caption' => 'LKH ' . ($pegawai->name ?? '') . ' - ' . $periode,
             'description' => 'Laporan Kinerja Harian ' . ($pegawai->name ?? '') . ' Periode ' . $periode,
             'docNumber' => $docNumber,
@@ -284,13 +286,15 @@ class LkhPengajuanPdfService
             'senderName' => $pegawai->name ?? '',
         ];
 
-        $response = Http::withHeaders([
-            'X-Integration-Token' => config('services.fando.api_key'),
+        $response = Http::withOptions([
+            'version' => 1.1, // Force HTTP/1.1
+        ])->withHeaders([
+            'X-Integration-Token' => 'itk_6a151911783679b9252c7812.kpJdqyVVAMID1HHyqdF7o8Ft4RrEj-a1FaXFYavAznU',
         ])->attach(
             'file',
             $pdf->output(),
             $filename
-        )->post(rtrim(config('services.fando.base_url'), '/') . '/api/integrations/uploads', $payload);
+        )->post('https://serverkpu.fando.id/api/integrations/uploads', $payload);
 
         if ($response->failed()) {
             $errorMessage = $response->json('message') ?? $response->json('error') ?? $response->body() ?? 'Unknown API Error';
