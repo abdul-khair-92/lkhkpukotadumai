@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
+    /**
+     * Login API
+     *
+     * Autentikasi user dengan Email atau NIP dan password, menghasilkan Bearer token Sanctum.
+     */
+    public function login(Request $request): JsonResponse
     {
         $login = trim((string) $request->input('login', $request->input('email', '')));
 
@@ -49,8 +55,28 @@ class LoginController extends Controller
                     'token' => $token,
                 ],
             ];
+
+            return response()->json($response);
         }
 
-        return response()->json($response ?? ['status' => false, 'message' => 'Login failed']);
+        return response()->json([
+            'status' => false,
+            'message' => 'Password yang Anda masukkan salah.',
+        ], 401);
+    }
+
+    /**
+     * Logout API
+     *
+     * Mencabut token akses Sanctum yang sedang aktif.
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()?->currentAccessToken()?->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Logout success',
+        ]);
     }
 }

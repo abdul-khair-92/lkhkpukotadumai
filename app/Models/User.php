@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'atasan_id');
     }
 
+    public function lkhs(): HasMany
+    {
+        return $this->hasMany(LKH::class, 'user_id');
+    }
+
     public function bawahan(): HasMany
     {
         return $this->hasMany(User::class, 'atasan_id');
